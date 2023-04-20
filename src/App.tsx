@@ -1,12 +1,31 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 
+const WORD_LENGTH = 5;
+
+function getColor(state: string) {
+    switch (state) {
+        case "b":
+            return "gray";
+        case "g":
+            return "green";
+        case "y":
+            return "yellow";
+        default:
+            return "none";
+    }
+}
+
 function App() {
-    const [wordsState, setWordsState] = useState(new Array(30).fill(""));
+    const [letterState, setLetterState] = useState(new Array(WORD_LENGTH * 6).fill(""));
+    const [correctState, setCorrectState] = useState(new Array(WORD_LENGTH * 6).fill(""));
+
+    const [currentWord, setCurrentWord] = useState("PILOT");
+    const [currentTry, setCurrentTry] = useState(0);
 
     useEffect(() => {
         document.onkeyup = (event) => {
-            setWordsState((prevState) => {
+            setLetterState((prevState) => {
                 let isSetted = false;
 
                 return prevState.map((val, index) => {
@@ -17,20 +36,40 @@ function App() {
 
                     if (!isSetted && !val && event.key.length === 1) {
                         isSetted = true;
-                        return event.key;
+                        return event.key.toUpperCase();
                     }
 
                     return val;
                 })
-            })
+            });
         }
 
     }, []);
 
+    useEffect(() => {
+        let counter = 0;
+        for (let i = WORD_LENGTH * currentTry; i < WORD_LENGTH; i++) {
+            if (letterState[i]) {
+                let state = "b";
+                if (currentWord[counter] === letterState[i]) {
+                    state = "g";
+                } else if (currentWord.includes(letterState[i])) {
+                    state = "y";
+                }
+
+                setCorrectState((prevState) => prevState.map((val, index) => index === i ? state : val))
+            }
+
+
+            counter++;
+        }
+    }, [letterState]);
+
     return (
         <div className="app">
             <div className="grid">
-                {wordsState.map(word => <div className="cell">{word}</div>)}
+                {letterState.map((letter, index) => <div className="cell"
+                                                         style={{backgroundColor: getColor(correctState[index])}}>{letter}</div>)}
             </div>
         </div>
     );
