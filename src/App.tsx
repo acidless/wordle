@@ -1,22 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
 import words from "./words"
-import Keypad from "./Components/Keypad";
+import Keypad, {getColor} from "./Components/Keypad";
 
 const WORD_LENGTH = 5;
-
-function getColor(state: string) {
-    switch (state) {
-        case "b":
-            return "gray";
-        case "g":
-            return "green";
-        case "y":
-            return "yellow";
-        default:
-            return "none";
-    }
-}
 
 function App() {
     const [letterState, setLetterState] = useState(new Array(WORD_LENGTH * 6).fill(""));
@@ -64,7 +51,6 @@ function App() {
     }, []);
 
     function checkLetters() {
-        console.log(letterState);
         if (letterState[WORD_LENGTH * (currentTry + 1) - 1]) {
             let found = false;
 
@@ -77,7 +63,6 @@ function App() {
             }
 
 
-            console.log(found);
             if (!found) {
                 return;
             }
