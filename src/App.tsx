@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
+import words from "./words"
 
 const WORD_LENGTH = 5;
 
@@ -44,19 +45,48 @@ function App() {
         });
     }, [currentTry]);
 
+    useEffect(()=>{
+        let word = "";
+
+        while(word.length !== WORD_LENGTH){
+            const randomWordIdx = Math.floor(Math.random() * words.length);
+            word = words[randomWordIdx];
+        }
+
+        console.log(word);
+        setCurrentWord(word.toUpperCase());
+
+    },[]);
+
     useEffect(() => {
         document.onkeyup = onKeyUp;
-
     }, [onKeyUp]);
 
     function checkLetters() {
         if (letterState[WORD_LENGTH * (currentTry + 1) - 1]) {
+            let found = false;
+
+            for(let word of words){
+                if(word.toUpperCase() === letterState.join("").substr(WORD_LENGTH * currentTry, WORD_LENGTH)){
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found){
+                return;
+            }
+
+
             let counter = 0;
+            let rightLettersCount = 0;
+
             for (let i = WORD_LENGTH * currentTry; i < WORD_LENGTH * (currentTry + 1); i++) {
                 if (letterState[i]) {
                     let state = "b";
                     if (currentWord[counter] === letterState[i]) {
                         state = "g";
+                        rightLettersCount++;
                     } else if (currentWord.includes(letterState[i])) {
                         state = "y";
                     }
@@ -69,6 +99,10 @@ function App() {
             }
 
             setCurrentTry(prevState => prevState + 1);
+
+            if(rightLettersCount === WORD_LENGTH){
+
+            }
         }
     }
 
