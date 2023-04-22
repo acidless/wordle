@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
 import words from "./words"
+import Keypad from "./Components/Keypad";
 
 const WORD_LENGTH = 5;
 
@@ -23,60 +24,63 @@ function App() {
 
     const [currentWord, setCurrentWord] = useState("PILOT");
     const [currentTry, setCurrentTry] = useState(0);
-    const onKeyUp = useCallback((event:any) => {
+    const onButtonPress = useCallback((key: string) => {
+        if (key === "Enter") {
+            checkLetters();
+            return;
+        }
+
         setLetterState((prevState) => {
             let isSetted = false;
 
             return prevState.map((val, index) => {
                 if (index >= WORD_LENGTH * currentTry && index < WORD_LENGTH * (currentTry + 1)) {
-                    if (!isSetted && event.key === "Backspace" && val && !prevState[index + 1]) {
+                    if (!isSetted && key === "Backspace" && val && !prevState[index + 1]) {
                         isSetted = true;
                         return "";
                     }
 
-                    if (!isSetted && !val && event.key.length === 1) {
+                    if (!isSetted && !val && key.length === 1) {
                         isSetted = true;
-                        return event.key.toUpperCase();
+                        return key;
                     }
                 }
 
                 return val;
             })
         });
-    }, [currentTry]);
+    }, [checkLetters, currentTry]);
 
-    useEffect(()=>{
+    useEffect(() => {
         let word = "";
 
-        while(word.length !== WORD_LENGTH){
+        while (word.length !== WORD_LENGTH) {
             const randomWordIdx = Math.floor(Math.random() * words.length);
             word = words[randomWordIdx];
         }
 
-        console.log(word);
         setCurrentWord(word.toUpperCase());
 
-    },[]);
-
-    useEffect(() => {
-        document.onkeyup = onKeyUp;
-    }, [onKeyUp]);
+    }, []);
 
     function checkLetters() {
+        console.log(letterState);
         if (letterState[WORD_LENGTH * (currentTry + 1) - 1]) {
             let found = false;
 
-            for(let word of words){
-                if(word.toUpperCase() === letterState.join("").substr(WORD_LENGTH * currentTry, WORD_LENGTH)){
+
+            for (let word of words) {
+                if (word.toUpperCase() === letterState.join("").substr(WORD_LENGTH * currentTry, WORD_LENGTH)) {
                     found = true;
                     break;
                 }
             }
 
-            if(!found){
+
+            console.log(found);
+            if (!found) {
                 return;
             }
-
 
             let counter = 0;
             let rightLettersCount = 0;
@@ -100,7 +104,7 @@ function App() {
 
             setCurrentTry(prevState => prevState + 1);
 
-            if(rightLettersCount === WORD_LENGTH){
+            if (rightLettersCount === WORD_LENGTH) {
 
             }
         }
@@ -112,7 +116,7 @@ function App() {
                 {letterState.map((letter, index) => <div className="cell"
                                                          style={{backgroundColor: getColor(correctState[index])}}>{letter}</div>)}
             </div>
-            <button onClick={checkLetters}>Submit</button>
+            <Keypad lettersState={letterState} correctState={correctState} onButtonPress={onButtonPress}/>
         </div>
     );
 }

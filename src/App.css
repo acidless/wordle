@@ -31,3 +31,22 @@ html {
     align-items: center;
     font-size: 2rem;
 }
+
+.keypad {
+    width: 30em;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-gap: 0.25em;
+}
+
+.keypad__erase, .keypad__enter {
+    grid-row: 3;
+}
+
+.keypad__erase {
+    grid-column: 1/3;
+}
+
+.keypad__enter {
+    grid-column: 11/13;
+}
