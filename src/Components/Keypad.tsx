@@ -1,12 +1,4 @@
-import React from "react";
-
 const keyData = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ";
-
-type PropsType = {
-    lettersState: Array<string>;
-    correctState: Array<string>;
-    onButtonPress: (state: string) => void;
-}
 
 export function getColor(state: string) {
     switch (state) {
@@ -21,7 +13,13 @@ export function getColor(state: string) {
     }
 }
 
-const Keypad: React.FC<PropsType> = function ({lettersState, onButtonPress, correctState}) {
+type Props = {
+    lettersState: Array<string>;
+    correctState: Array<string>;
+    onButtonPress: (state: string) => void;
+}
+
+const Keypad = ({lettersState, onButtonPress, correctState}: Props) => {
     return <div className="keypad">
         {keyData.split("").map(letter => {
             let color = "";
@@ -37,7 +35,7 @@ const Keypad: React.FC<PropsType> = function ({lettersState, onButtonPress, corr
         <button className="keypad__erase" onClick={() => onButtonPress("Backspace")}>
             <img src="/backspace.svg" alt=""/>
         </button>
-        <button className="keypad__enter" onClick={() => onButtonPress("Enter")}>ВВОД</button>
+        <button className="keypad__enter" onClick={() => onButtonPress("Enter")}>ОК</button>
     </div>
 }
 
