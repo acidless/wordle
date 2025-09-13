@@ -11,6 +11,7 @@ function App() {
 
     const [currentWord, setCurrentWord] = useState("PILOT");
     const [currentTry, setCurrentTry] = useState(0);
+
     const onButtonPress = useCallback((key: string) => {
         if (key === "Enter") {
             checkLetters();
@@ -27,16 +28,19 @@ function App() {
                         return "";
                     }
 
-                    if (!isSetted && !val && key.length === 1) {
+                    const upperKey = key.toUpperCase();
+                    const isKeyRussian = upperKey.charCodeAt(0) >= "А".charCodeAt(0)
+                        && upperKey.charCodeAt(0) <= "Я".charCodeAt(0);
+                    if (!isSetted && !val && isKeyRussian) {
                         isSetted = true;
-                        return key;
+                        return key.toUpperCase();
                     }
                 }
 
                 return val;
             })
         });
-    }, [checkLetters, currentTry]);
+    }, [currentTry, checkLetters]);
 
     useEffect(() => {
         let word = "";
@@ -47,13 +51,23 @@ function App() {
         }
 
         setCurrentWord(word.toUpperCase());
-
     }, []);
+
+    useEffect(() => {
+        function onKeypress(event: KeyboardEvent) {
+            onButtonPress(event.key);
+        }
+
+        document.addEventListener("keydown", onKeypress);
+
+        return () => {
+            document.removeEventListener("keydown", onKeypress);
+        };
+    }, [onButtonPress]);
 
     function checkLetters() {
         if (letterState[WORD_LENGTH * (currentTry + 1) - 1]) {
             let found = false;
-
 
             for (let word of words) {
                 if (word.toUpperCase() === letterState.join("").substr(WORD_LENGTH * currentTry, WORD_LENGTH)) {
@@ -62,35 +76,45 @@ function App() {
                 }
             }
 
-
             if (!found) {
                 return;
             }
 
-            let counter = 0;
+            let guess = letterState.slice(WORD_LENGTH * currentTry, WORD_LENGTH * (currentTry + 1));
             let rightLettersCount = 0;
 
-            for (let i = WORD_LENGTH * currentTry; i < WORD_LENGTH * (currentTry + 1); i++) {
-                if (letterState[i]) {
-                    let state = "b";
-                    if (currentWord[counter] === letterState[i]) {
-                        state = "g";
-                        rightLettersCount++;
-                    } else if (currentWord.includes(letterState[i])) {
-                        state = "y";
-                    }
+            let result = new Array(WORD_LENGTH).fill("b");
+            let availableLetters = currentWord.split("");
 
-                    setCorrectState((prevState) => prevState.map((val, index) => index === i ? state : val))
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                if (guess[i] === currentWord[i]) {
+                    result[i] = "g";
+                    rightLettersCount++;
+                    availableLetters.splice(i, 1);
                 }
-
-
-                counter++;
             }
+
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                if (result[i] === "b" && guess[i]) {
+                    const index = availableLetters.indexOf(guess[i]);
+                    if (index > -1) {
+                        result[i] = "y";
+                        availableLetters.splice(i, 1);
+                    }
+                }
+            }
+
+            setCorrectState(prevState =>
+                prevState.map((val, index) =>
+                    index >= WORD_LENGTH * currentTry && index < WORD_LENGTH * (currentTry + 1)
+                        ? result[index % WORD_LENGTH]
+                        : val
+                )
+            );
 
             setCurrentTry(prevState => prevState + 1);
 
             if (rightLettersCount === WORD_LENGTH) {
-
             }
         }
     }
@@ -98,8 +122,10 @@ function App() {
     return (
         <div className="app">
             <div className="grid">
-                {letterState.map((letter, index) => <div className="cell"
-                                                         style={{backgroundColor: getColor(correctState[index])}}>{letter}</div>)}
+                {letterState.map((letter, index) =>
+                    <div className={`cell${letter ? " has-letter" : ""}`} key={index}
+                         style={{borderColor: getColor(correctState[index])}}>{letter}</div>)
+                }
             </div>
             <Keypad lettersState={letterState} correctState={correctState} onButtonPress={onButtonPress}/>
         </div>

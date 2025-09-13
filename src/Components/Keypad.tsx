@@ -11,13 +11,13 @@ type PropsType = {
 export function getColor(state: string) {
     switch (state) {
         case "b":
-            return "gray";
+            return "var(--gray)";
         case "g":
-            return "green";
+            return "var(--green)";
         case "y":
-            return "yellow";
+            return "var(--yellow)";
         default:
-            return "none";
+            return "";
     }
 }
 
@@ -28,12 +28,15 @@ const Keypad: React.FC<PropsType> = function ({lettersState, onButtonPress, corr
             for (let i = 0; i < lettersState.length; i++) {
                 if (lettersState[i] === letter) {
                     color = getColor(correctState[i]);
+                    break;
                 }
             }
 
-            return <button style={{backgroundColor: color}} onClick={() => onButtonPress(letter)}>{letter}</button>
+            return <button key={letter} style={{backgroundColor: color}} onClick={() => onButtonPress(letter)}>{letter}</button>
         })}
-        <button className="keypad__erase" onClick={() => onButtonPress("Backspace")}>-</button>
+        <button className="keypad__erase" onClick={() => onButtonPress("Backspace")}>
+            <img src="/backspace.svg" alt=""/>
+        </button>
         <button className="keypad__enter" onClick={() => onButtonPress("Enter")}>ВВОД</button>
     </div>
 }
