@@ -123,6 +123,7 @@ button {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.28, 1.40, 0.42, 1);
+    padding: 1rem;
 }
 
 .modal.opened {
@@ -137,6 +138,7 @@ button {
     position: relative;
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.28, 1.40, 0.42, 1);
+    max-width: 100%;
 }
 
 .modal.opened .modal__inner {
@@ -164,6 +166,7 @@ button {
     align-items: center;
     flex-direction: column;
     gap: 0.25rem;
+    max-width: 90vw;
 }
 
 .win-modal__emoji {

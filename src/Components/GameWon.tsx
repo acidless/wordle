@@ -5,7 +5,7 @@ type Props = {
     isWon: boolean;
 };
 
-const GameSucces = ({isWon}: Props) => {
+const GameWon = ({isWon}: Props) => {
     const [isOpened, setOpened] = useState(isWon);
 
     useEffect(() => {
@@ -21,4 +21,4 @@ const GameSucces = ({isWon}: Props) => {
     </ModalWindow>;
 }
 
-export default GameSucces;
+export default GameWon;

@@ -2,11 +2,15 @@ import './App.css';
 import Keypad, {getColor} from "./Components/Keypad";
 import useWordle from "./useWordle";
 import InvalidWord from "./Components/InvalidWord";
-import GameSucces from "./Components/GameSucces";
+import GameWon from "./Components/GameWon";
+import GameLost from "./Components/GameLost";
 
 
 function App() {
-    const {letterState, correctState, onButtonPress, isInvalidWord, resetInvalidWord, isWon} = useWordle();
+    const {
+        letterState, correctState, onButtonPress,
+        isInvalidWord, resetInvalidWord, isWon, lostWord
+    } = useWordle();
 
     return (
         <div className="app">
@@ -18,7 +22,8 @@ function App() {
             </div>
             <Keypad lettersState={letterState} correctState={correctState} onButtonPress={onButtonPress}/>
             <InvalidWord isInvalid={isInvalidWord} close={resetInvalidWord}/>
-            <GameSucces isWon={isWon}/>
+            <GameWon isWon={isWon}/>
+            <GameLost lostWord={lostWord}/>
         </div>
     );
 }
