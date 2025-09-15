@@ -1,21 +1,25 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect} from "react";
 import words from "./words"
-
-const WORD_LENGTH = 5;
+import {
+    useStore,
+    WORD_LENGTH,
+    setCurrentWord,
+    setLetterState,
+    setCorrectState,
+    setWon,
+    setLostWord,
+    setInvalidWord,
+} from "./wordleStore";
 
 function useWordle() {
-    const [letterState, setLetterState] = useState(new Array(WORD_LENGTH * 6).fill(""));
-    const [correctState, setCorrectState] = useState(new Array(WORD_LENGTH * 6).fill(""));
-
-    const [currentWord, setCurrentWord] = useState("PILOT");
-    const [currentTry, setCurrentTry] = useState(0);
-    const [isInvalidWord, setInvalidWord] = useState(false);
-    const [isWon, setWon] = useState(false);
-    const [lostWord, setLostWord] = useState("");
+    const {letterState, correctState, currentWord, currentTry, isInvalidWord, isWon, lostWord} = useStore();
 
     function isValidWord() {
         for (let word of words) {
-            if (word.toUpperCase() === letterState.join("").substr(WORD_LENGTH * currentTry, WORD_LENGTH)) {
+            const checkingWord = letterState.join("")
+                .substring(WORD_LENGTH * currentTry, WORD_LENGTH * (currentTry + 1));
+
+            if (word.toUpperCase() === checkingWord) {
                 return true;
             }
         }
@@ -25,7 +29,8 @@ function useWordle() {
     }
 
     function checkLetters() {
-        if (letterState[WORD_LENGTH * (currentTry + 1) - 1]) {
+        const lastCharSetted = letterState[WORD_LENGTH * (currentTry + 1) - 1];
+        if (lastCharSetted) {
             if (!isValidWord()) {
                 return;
             }
@@ -54,22 +59,14 @@ function useWordle() {
                 }
             }
 
-            setCorrectState(prevState =>
-                prevState.map((val, index) =>
-                    index >= WORD_LENGTH * currentTry && index < WORD_LENGTH * (currentTry + 1)
-                        ? result[index % WORD_LENGTH]
-                        : val
-                )
-            );
-
-            setCurrentTry(prevState => prevState + 1);
+            setCorrectState(result);
 
             if (rightLettersCount === WORD_LENGTH) {
-                setWon(true);
+                setWon();
                 return;
             }
 
-            if(currentTry >= 5) {
+            if (currentTry >= 5) {
                 setLostWord(currentWord);
                 return;
             }
@@ -82,28 +79,7 @@ function useWordle() {
             return;
         }
 
-        setLetterState((prevState) => {
-            let isSetted = false;
-
-            return prevState.map((val, index) => {
-                if (index >= WORD_LENGTH * currentTry && index < WORD_LENGTH * (currentTry + 1)) {
-                    if (!isSetted && key === "Backspace" && val && !prevState[index + 1]) {
-                        isSetted = true;
-                        return "";
-                    }
-
-                    const upperKey = key.toUpperCase();
-                    const isKeyRussian = upperKey.charCodeAt(0) >= "А".charCodeAt(0)
-                        && upperKey.charCodeAt(0) <= "Я".charCodeAt(0);
-                    if (!isSetted && !val && isKeyRussian) {
-                        isSetted = true;
-                        return key.toUpperCase();
-                    }
-                }
-
-                return val;
-            })
-        });
+        setLetterState(key);
     }, [currentTry, checkLetters]);
 
     useEffect(() => {
