@@ -10,6 +10,7 @@ function useWordle() {
     const [currentWord, setCurrentWord] = useState("PILOT");
     const [currentTry, setCurrentTry] = useState(0);
     const [isInvalidWord, setInvalidWord] = useState(false);
+    const [isWon, setWon] = useState(false);
 
     function isValidWord() {
         for (let word of words) {
@@ -63,6 +64,7 @@ function useWordle() {
             setCurrentTry(prevState => prevState + 1);
 
             if (rightLettersCount === WORD_LENGTH) {
+                setWon(true);
             }
         }
     }
@@ -120,7 +122,7 @@ function useWordle() {
         };
     }, [onButtonPress]);
 
-    return {letterState, correctState, onButtonPress, isInvalidWord, resetInvalidWord: () => setInvalidWord(false)};
+    return {letterState, correctState, onButtonPress, isInvalidWord, resetInvalidWord: () => setInvalidWord(false), isWon};
 }
 
 export default useWordle;

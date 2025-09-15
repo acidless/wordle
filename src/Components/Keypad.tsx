@@ -32,8 +32,8 @@ const Keypad = ({lettersState, onButtonPress, correctState}: Props) => {
 
             return <button key={letter} style={{backgroundColor: color}} onClick={() => onButtonPress(letter)}>{letter}</button>
         })}
-        <button className="keypad__erase" onClick={() => onButtonPress("Backspace")}>
-            <img src="/backspace.svg" alt=""/>
+        <button aria-label="Стереть" className="keypad__erase" onClick={() => onButtonPress("Backspace")}>
+            <img src={`${process.env.PUBLIC_URL}/backspace.svg`} alt=""/>
         </button>
         <button className="keypad__enter" onClick={() => onButtonPress("Enter")}>ОК</button>
     </div>
