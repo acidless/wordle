@@ -14,7 +14,7 @@ import {
 function useWordle() {
     const {letterState, correctState, currentWord, currentTry, isInvalidWord, isWon, lostWord} = useStore();
 
-    function isValidWord() {
+    const isValidWord = useCallback(() => {
         for (let word of words) {
             const checkingWord = letterState.join("")
                 .substring(WORD_LENGTH * currentTry, WORD_LENGTH * (currentTry + 1));
@@ -26,9 +26,9 @@ function useWordle() {
 
         setInvalidWord(true);
         return false;
-    }
+    }, [letterState, currentTry]);
 
-    function checkLetters() {
+    const checkLetters = useCallback(() => {
         const lastCharSetted = letterState[WORD_LENGTH * (currentTry + 1) - 1];
         if (lastCharSetted) {
             if (!isValidWord()) {
@@ -71,7 +71,7 @@ function useWordle() {
                 return;
             }
         }
-    }
+    }, [currentTry, currentWord, letterState, isValidWord]);
 
     const onButtonPress = useCallback((key: string) => {
         if (key === "Enter") {
@@ -80,7 +80,7 @@ function useWordle() {
         }
 
         setLetterState(key);
-    }, [currentTry, checkLetters]);
+    }, [checkLetters]);
 
     useEffect(() => {
         let word = "";
